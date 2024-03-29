@@ -6,12 +6,13 @@ import sqlite3
 import tempfile
 import unittest
 
+
 class TestEcmServer(unittest.TestCase):
     """EcmServer test cases."""
 
     def setUp(self):
-        self.tmp_f = tempfile.NamedTemporaryFile()
-        self.tmp_path = self.tmp_f.name
+        self.tmp_d = tempfile.TemporaryDirectory()
+        self.tmp_path = os.path.join(self.tmp_d.name, 'temp.db')
 
         # Turn off 'creating DB' warning.
         logging.basicConfig(level=logging.ERROR)

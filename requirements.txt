@@ -1,3 +1,5 @@
 gmpy2
 sympy
 pyparsing
+sqlite
+flask

@@ -11,8 +11,8 @@ class TestEcmServer(unittest.TestCase):
     """EcmServer test cases."""
 
     def setUp(self):
-        self.tmp_d = tempfile.TemporaryDirectory()
-        self.tmp_path = os.path.join(self.tmp_d.name, 'temp.db')
+        self.tmp_f = tempfile.TemporaryDirectory()
+        self.tmp_path = os.path.join(self.tmp_f.name, "ecm-server.db")
 
         # Turn off 'creating DB' warning.
         logging.basicConfig(level=logging.ERROR)

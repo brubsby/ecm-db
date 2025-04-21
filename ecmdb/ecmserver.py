@@ -31,6 +31,8 @@ class EcmServer:
     def __init__(self, db_file="./ecm-server.db"):
         self._db_file = db_file
         self._app = self._init_webapp()
+        with self._app.app_context():
+            self._get_db()
 
 
     def run(self, *args, **kwargs):
@@ -69,19 +71,21 @@ class EcmServer:
                 logging.warning(f"Creating db({self._db_file}) from {schema_path}")
                 with open(schema_path) as schema_f:
                     schema = schema_f.read()
-                    with self.cursor() as cur:
-                        cur.executescript(schema)
+                    cur = g._db.cursor()
+                    cur.executescript(schema)
+                    cur.close()
+                    g._db.commit()
         return g._db
 
 
-    def _cursor(self):
+    def cursor(self):
         return contextlib.closing(self._get_db().cursor())
 
 
     def find_number(self, n):
         """Find record for number if it's part of the database"""
         # TODO allow lookup by numid?
-        with self._cursor() as cur:
+        with self.cursor() as cur:
             cur.execute('SELECT * from numbers where n = ?', (n,))
             records = cur.fetchall()
 
@@ -108,14 +112,14 @@ class EcmServer:
 
         status = 2 if gmpy2.is_prime(n) else 5
 
-        with self._cursor() as cur:
+        with self.cursor() as cur:
             cur.execute('INSERT INTO numbers VALUES (null,?,?)', (n, status))
         self._get_db().commit()
 
         return self.find_number(n)
 
     def status(self):
-        with self._cursor() as cur:
+        with self.cursor() as cur:
             # TODO add t-level or some level of ecm summary
             cur.execute('SELECT numbers.* FROM numbers')
             records = cur.fetchall()
